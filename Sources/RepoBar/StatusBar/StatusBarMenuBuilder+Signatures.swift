@@ -378,6 +378,7 @@ struct RepoSubmenuSignature: Hashable {
     let changelogHeadline: String?
     let isPinned: Bool
     let menuCustomization: MenuCustomization
+    let isLightAppearance: Bool
 
     init(
         repo: RepositoryDisplayModel,
@@ -386,7 +387,8 @@ struct RepoSubmenuSignature: Hashable {
         recentCounts: RepoRecentCountSignature,
         changelogPresentation: ChangelogRowPresentation?,
         changelogHeadline: String?,
-        isPinned: Bool
+        isPinned: Bool,
+        isLightAppearance: Bool
     ) {
         self.fullName = repo.title
         self.issues = repo.issues
@@ -413,6 +415,7 @@ struct RepoSubmenuSignature: Hashable {
         self.changelogHeadline = changelogHeadline
         self.isPinned = isPinned
         self.menuCustomization = settings.menuCustomization.normalized()
+        self.isLightAppearance = isLightAppearance
     }
 
     private static func digest(events: [ActivityEvent]) -> Int {

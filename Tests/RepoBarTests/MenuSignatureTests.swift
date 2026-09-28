@@ -68,7 +68,8 @@ struct MenuSignatureTests {
             ),
             changelogPresentation: nil,
             changelogHeadline: nil,
-            isPinned: false
+            isPinned: false,
+            isLightAppearance: true
         )
 
         let updatedRepo = Repository(
@@ -98,7 +99,8 @@ struct MenuSignatureTests {
             ),
             changelogPresentation: nil,
             changelogHeadline: nil,
-            isPinned: false
+            isPinned: false,
+            isLightAppearance: true
         )
 
         #expect(signatureA != signatureB)
@@ -173,6 +175,45 @@ struct MenuSignatureTests {
 
         #expect(Self.emptyMenuBuildSignature(settings: settings, isLightAppearance: true, now: now)
             != Self.emptyMenuBuildSignature(settings: settings, isLightAppearance: false, now: now))
+    }
+
+    @Test
+    func `repo submenu signature changes with effective appearance`() {
+        let now = Date(timeIntervalSinceReferenceDate: 2_600_000)
+        let range = HeatmapRange(start: now.addingTimeInterval(-86400), end: now)
+        let repo = Repository(
+            id: "3",
+            name: "Heatmap",
+            owner: "me",
+            sortOrder: 0,
+            error: nil,
+            rateLimitedUntil: nil,
+            ciStatus: .unknown,
+            openIssues: 0,
+            openPulls: 0,
+            latestRelease: nil,
+            latestActivity: nil,
+            activityEvents: [],
+            traffic: nil,
+            heatmap: []
+        )
+        let display = RepositoryDisplayModel(repo: repo, now: now)
+        var settings = UserSettings()
+        settings.heatmap.display = .submenu
+        func signature(isLightAppearance: Bool) -> RepoSubmenuSignature {
+            RepoSubmenuSignature(
+                repo: display,
+                settings: settings,
+                heatmapRange: range,
+                recentCounts: RepoRecentCountSignature(commits: nil, commitsDigest: nil),
+                changelogPresentation: nil,
+                changelogHeadline: nil,
+                isPinned: false,
+                isLightAppearance: isLightAppearance
+            )
+        }
+
+        #expect(signature(isLightAppearance: true) != signature(isLightAppearance: false))
     }
 
     @Test
