@@ -165,6 +165,17 @@ struct MenuSignatureTests {
     }
 
     @Test
+    func `menu settings signature changes with color scheme`() {
+        var settings = UserSettings()
+        let systemSignature = MenuSettingsSignature(settings: settings, selection: .all)
+
+        settings.appearance.colorScheme = .dark
+        let darkSignature = MenuSettingsSignature(settings: settings, selection: .all)
+
+        #expect(systemSignature != darkSignature)
+    }
+
+    @Test
     func `rate limit menu signature changes with cached remaining count`() {
         let now = Date(timeIntervalSinceReferenceDate: 3_000_000)
         let stale = Self.cacheSummary(remaining: 3700, now: now)

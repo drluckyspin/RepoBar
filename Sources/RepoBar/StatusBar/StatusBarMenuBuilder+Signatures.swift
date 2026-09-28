@@ -220,6 +220,7 @@ struct MenuSettingsSignature: Hashable {
     let cardDensity: CardDensity
     let accentTone: AccentTone
     let activityScope: GlobalActivityScope
+    let colorScheme: AppColorScheme
     let heatmapDisplay: HeatmapDisplay
     let heatmapSpan: HeatmapSpan
     let displayLimit: Int
@@ -237,6 +238,7 @@ struct MenuSettingsSignature: Hashable {
         self.cardDensity = settings.appearance.cardDensity
         self.accentTone = settings.appearance.accentTone
         self.activityScope = settings.appearance.activityScope
+        self.colorScheme = settings.appearance.colorScheme
         self.heatmapDisplay = settings.heatmap.display
         self.heatmapSpan = settings.heatmap.span
         self.displayLimit = settings.repoList.displayLimit

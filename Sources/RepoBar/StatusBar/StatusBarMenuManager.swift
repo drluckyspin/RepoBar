@@ -88,6 +88,12 @@ final class StatusBarMenuManager: NSObject, NSMenuDelegate {
         )
         NotificationCenter.default.addObserver(
             self,
+            selector: #selector(self.appAppearanceChanged),
+            name: .appAppearanceDidChange,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
             selector: #selector(self.recentListFiltersChanged),
             name: .recentListFiltersDidChange,
             object: nil
@@ -133,6 +139,7 @@ final class StatusBarMenuManager: NSObject, NSMenuDelegate {
     func attachMainMenu(to statusItem: NSStatusItem) {
         let menu = self.mainMenu ?? self.menuBuilder.makeMainMenu()
         self.mainMenu = menu
+        self.syncMainMenuAppearance()
         menu.delegate = self
         self.statusItem = statusItem
         statusItem.length = NSStatusItem.variableLength
@@ -210,6 +217,19 @@ final class StatusBarMenuManager: NSObject, NSMenuDelegate {
 
     @objc private func recentListFiltersChanged() {
         self.recentListCoordinator.handleFilterChanges()
+    }
+
+    @objc private func appAppearanceChanged() {
+        self.syncMainMenuAppearance()
+    }
+
+    /// Setting the appearance in `menuWillOpen` only affects the next open: AppKit has already laid out
+    /// the menu window by then. Pin it up front (on attach and whenever the app appearance changes) so a
+    /// forced Light/Dark mode is correct on the first open.
+    private func syncMainMenuAppearance() {
+        guard let app = NSApp, let menu = self.mainMenu else { return }
+
+        menu.appearance = app.effectiveAppearance
     }
 
     private func applyStatusItemAppearance() {
