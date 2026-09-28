@@ -5,6 +5,7 @@
 - Fix direct debug packaging on macOS Bash 3.2 while preserving strict shell checks and universal release builds (thanks @prakersh). (#134)
 - Stop packaging when signing or requested notarization fails instead of reporting success for an unfinished app bundle.
 - Add an Appearance setting (Light, Dark, System Default) to General settings so RepoBar's menus and windows can follow macOS or stay in a fixed mode; also available as `repobar settings set color-scheme`.
+- Recolor the main menu on the first open after macOS switches between Light and Dark instead of showing the previous appearance once.
 
 ## 0.9.3 - 2026-09-19
 

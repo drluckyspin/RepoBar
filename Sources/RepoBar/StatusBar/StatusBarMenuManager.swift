@@ -44,6 +44,7 @@ final class StatusBarMenuManager: NSObject, NSMenuDelegate {
     private var lastMainMenuSignature: MenuBuildSignature?
     private var lastMainMenuWidthSignature: MenuBuildSignature?
     private var pendingMenuReopen = false
+    private var appAppearanceObservation: NSKeyValueObservation?
     private lazy var issueNavigatorWindowController = IssueNavigatorWindowController(appState: self.appState)
     private lazy var gitHubReferenceStatusCoordinator = GitHubReferenceStatusCoordinator(
         appState: self.appState,
@@ -84,12 +85,6 @@ final class StatusBarMenuManager: NSObject, NSMenuDelegate {
             self,
             selector: #selector(self.menuRepositoriesChanged),
             name: .menuDiagnosticsDidChange,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(self.appAppearanceChanged),
-            name: .appAppearanceDidChange,
             object: nil
         )
         NotificationCenter.default.addObserver(
@@ -140,6 +135,7 @@ final class StatusBarMenuManager: NSObject, NSMenuDelegate {
         let menu = self.mainMenu ?? self.menuBuilder.makeMainMenu()
         self.mainMenu = menu
         self.syncMainMenuAppearance()
+        self.observeAppAppearanceIfNeeded()
         menu.delegate = self
         self.statusItem = statusItem
         statusItem.length = NSStatusItem.variableLength
@@ -219,13 +215,20 @@ final class StatusBarMenuManager: NSObject, NSMenuDelegate {
         self.recentListCoordinator.handleFilterChanges()
     }
 
-    @objc private func appAppearanceChanged() {
-        self.syncMainMenuAppearance()
+    /// Covers both the RepoBar Appearance setting and macOS switching while RepoBar follows the system.
+    private func observeAppAppearanceIfNeeded() {
+        guard self.appAppearanceObservation == nil, let app = NSApp else { return }
+
+        self.appAppearanceObservation = app.observe(\.effectiveAppearance, options: [.new]) { [weak self] _, _ in
+            Task { @MainActor [weak self] in
+                self?.syncMainMenuAppearance()
+            }
+        }
     }
 
     /// Setting the appearance in `menuWillOpen` only affects the next open: AppKit has already laid out
-    /// the menu window by then. Pin it up front (on attach and whenever the app appearance changes) so a
-    /// forced Light/Dark mode is correct on the first open.
+    /// the menu window by then. Pin it up front (on attach and whenever the app appearance changes) so the
+    /// current Light/Dark mode is correct on the first open.
     private func syncMainMenuAppearance() {
         guard let app = NSApp, let menu = self.mainMenu else { return }
 

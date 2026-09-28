@@ -45,6 +45,5 @@ extension AppState {
         guard let app = NSApp else { return }
 
         app.appearance = self.session.settings.appearance.colorScheme.nsAppearance
-        NotificationCenter.default.post(name: .appAppearanceDidChange, object: nil)
     }
 }

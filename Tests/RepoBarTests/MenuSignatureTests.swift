@@ -129,6 +129,7 @@ struct MenuSignatureTests {
         let signatureA = MenuBuildSignature(
             account: AccountSignature(.loggedOut),
             settings: MenuSettingsSignature(settings: settings, selection: .all),
+            isLightAppearance: true,
             hasLoadedRepositories: true,
             rateLimitReset: nil,
             rateLimits: RateLimitMenuSignature(.empty),
@@ -147,6 +148,7 @@ struct MenuSignatureTests {
         let signatureB = MenuBuildSignature(
             account: AccountSignature(.loggedOut),
             settings: MenuSettingsSignature(settings: settings, selection: .all),
+            isLightAppearance: true,
             hasLoadedRepositories: true,
             rateLimitReset: nil,
             rateLimits: RateLimitMenuSignature(.empty),
@@ -165,14 +167,12 @@ struct MenuSignatureTests {
     }
 
     @Test
-    func `menu settings signature changes with color scheme`() {
-        var settings = UserSettings()
-        let systemSignature = MenuSettingsSignature(settings: settings, selection: .all)
+    func `menu build signature changes with effective appearance`() {
+        let now = Date(timeIntervalSinceReferenceDate: 2_500_000)
+        let settings = UserSettings()
 
-        settings.appearance.colorScheme = .dark
-        let darkSignature = MenuSettingsSignature(settings: settings, selection: .all)
-
-        #expect(systemSignature != darkSignature)
+        #expect(Self.emptyMenuBuildSignature(settings: settings, isLightAppearance: true, now: now)
+            != Self.emptyMenuBuildSignature(settings: settings, isLightAppearance: false, now: now))
     }
 
     @Test
@@ -200,6 +200,30 @@ struct MenuSignatureTests {
         )
 
         #expect(ActionsSnapshotSignature.digest(for: [idle]) != ActionsSnapshotSignature.digest(for: [busy]))
+    }
+
+    private static func emptyMenuBuildSignature(
+        settings: UserSettings,
+        isLightAppearance: Bool,
+        now: Date
+    ) -> MenuBuildSignature {
+        MenuBuildSignature(
+            account: AccountSignature(.loggedOut),
+            settings: MenuSettingsSignature(settings: settings, selection: .all),
+            isLightAppearance: isLightAppearance,
+            hasLoadedRepositories: true,
+            rateLimitReset: nil,
+            rateLimits: RateLimitMenuSignature(.empty),
+            lastError: nil,
+            contribution: ContributionSignature(user: nil, error: nil, heatmapCount: 0),
+            globalActivity: ActivitySignature(events: [], error: nil),
+            globalCommits: CommitSignature(commits: [], error: nil),
+            heatmapRangeStart: now.timeIntervalSinceReferenceDate,
+            heatmapRangeEnd: now.timeIntervalSinceReferenceDate,
+            reposDigest: RepoSignature.digest(for: []),
+            actionsDigest: 0,
+            timeBucket: Int(now.timeIntervalSinceReferenceDate / 60)
+        )
     }
 
     private static func actionsSnapshot(runner: RunnerSummary, now: Date) -> ActionsOrgSnapshot {
