@@ -372,6 +372,7 @@ struct RepoSubmenuSignature: Hashable {
     let heatmapCount: Int
     let heatmapRangeStart: TimeInterval
     let heatmapRangeEnd: TimeInterval
+    let accentTone: AccentTone
     let activityDigest: Int
     let recentCounts: RepoRecentCountSignature
     let changelogPresentation: ChangelogRowPresentation?
@@ -409,6 +410,7 @@ struct RepoSubmenuSignature: Hashable {
         self.heatmapCount = repo.heatmap.count
         self.heatmapRangeStart = heatmapRange.start.timeIntervalSinceReferenceDate
         self.heatmapRangeEnd = heatmapRange.end.timeIntervalSinceReferenceDate
+        self.accentTone = settings.appearance.accentTone
         self.activityDigest = RepoSubmenuSignature.digest(events: repo.activityEvents)
         self.recentCounts = recentCounts
         self.changelogPresentation = changelogPresentation
